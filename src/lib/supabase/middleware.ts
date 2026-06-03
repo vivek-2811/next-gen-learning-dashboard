@@ -15,9 +15,9 @@ import { type NextRequest, NextResponse } from "next/server";
  *   3. Writes any updated cookies (new access/refresh tokens) onto the
  *      outgoing response so the browser receives them.
  *
- * Usage in `src/middleware.ts`:
+ * Usage in `src/proxy.ts` (Next.js 16+ — previously `src/middleware.ts`):
  *   import { updateSession } from "@/lib/supabase/middleware"
- *   export async function middleware(request: NextRequest) {
+ *   export async function proxy(request: NextRequest) {
  *     return await updateSession(request)
  *   }
  *
