@@ -32,15 +32,6 @@ export interface Course {
   created_at: string;
 }
 
-/**
- * Columns selected by `getCourses`. Explicitly typed so callers know
- * exactly what fields are present without inspecting the query.
- */
-export type CourseRow = Pick<
-  Course,
-  "id" | "title" | "progress" | "icon_name" | "created_at"
->;
-
 // ---------------------------------------------------------------------------
 // Mutation payload types
 // ---------------------------------------------------------------------------
@@ -58,7 +49,7 @@ export type UpdateCoursePayload = Partial<CreateCoursePayload>;
 /** Successful data fetch. */
 export type CourseFetchSuccess = {
   readonly status: "success";
-  readonly data: CourseRow[];
+  readonly data: Course[];
 };
 
 /** Data fetch that failed at the Supabase layer. */
