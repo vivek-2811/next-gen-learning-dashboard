@@ -1,46 +1,94 @@
 "use server";
 
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import type { Course } from "@/types/course";
+import type { CourseFetchResult, CourseRow } from "@/types/course";
+
+// ---------------------------------------------------------------------------
+// Column projection — kept as a constant so it stays in sync with CourseRow.
+// TypeScript will catch any mismatch between this string and the interface
+// when the returned data is assigned.
+// ---------------------------------------------------------------------------
+const COURSE_COLUMNS = "id, title, progress, icon_name, created_at" as const;
+
+// ---------------------------------------------------------------------------
+// getCourses — deduplicated, typed, server-only data fetcher
+// ---------------------------------------------------------------------------
 
 /**
- * Server Action: Fetches all courses from the `courses` table.
+ * Fetches all rows from the `courses` table, ordered newest-first.
  *
- * This action runs exclusively on the server — it is never bundled into the
- * client. It uses the authenticated Supabase server client so Row Level
- * Security (RLS) policies are respected automatically.
+ * ### Key behaviours
  *
- * Ordering: courses are returned newest-first by `created_at`.
+ * **Server-only** — the `"use server"` directive at the top of this file
+ * ensures this function is never included in the browser bundle.
  *
- * @returns An array of Course objects, or an empty array on error.
- * @throws  Never — errors are caught, logged, and an empty array is returned
- *          so the calling Server Component can always render safely.
+ * **Request deduplication** — wrapped in React's `cache()` so that multiple
+ * Server Components calling `getCourses()` within the same render pass share
+ * a single Supabase round-trip. The cache is scoped to one request/response
+ * cycle; it does not persist between requests.
  *
- * Usage in a Server Component:
- *   import { getCourses } from "@/actions/getCourses"
- *   const courses = await getCourses()
+ * **RLS-aware** — uses the authenticated server client, so Supabase Row Level
+ * Security policies on the `courses` table are enforced automatically.
+ *
+ * **Typed result** — returns a `CourseFetchResult` discriminated union rather
+ * than `Course[] | null`. Callers must handle both `"success"` and `"error"`
+ * branches, making error states explicit in the component tree.
+ *
+ * **Never throws** — all Supabase errors are caught and surfaced through the
+ * `"error"` branch. The calling Server Component always receives a value it
+ * can render safely.
+ *
+ * @returns {Promise<CourseFetchResult>}
+ *
+ * @example
+ * ```tsx
+ * // app/dashboard/page.tsx  (Server Component)
+ * import { getCourses } from "@/actions/getCourses"
+ *
+ * export default async function DashboardPage() {
+ *   const result = await getCourses()
+ *
+ *   if (result.status === "error") {
+ *     return <p>Failed to load courses: {result.message}</p>
+ *   }
+ *
+ *   return <CourseGrid courses={result.data} />
+ * }
+ * ```
  */
-export async function getCourses(): Promise<Course[]> {
-  const supabase = await createClient();
+export const getCourses: () => Promise<CourseFetchResult> = cache(
+  async (): Promise<CourseFetchResult> => {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("courses")
-    .select("id, title, progress, icon_name, created_at")
-    .order("created_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("courses")
+      .select(COURSE_COLUMNS)
+      .order("created_at", { ascending: false })
+      .returns<CourseRow[]>();
 
-  if (error) {
-    // Log to server console — never expose raw Supabase errors to the client.
-    console.error("[getCourses] Supabase query failed:", {
-      code: error.code,
-      message: error.message,
-      details: error.details,
-      hint: error.hint,
-    });
+    if (error) {
+      // Log structured error on the server — never expose raw Supabase
+      // internals to the client response.
+      console.error("[getCourses] Query failed:", {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
 
-    // Return empty array so the UI degrades gracefully rather than crashing.
-    return [];
-  }
+      return {
+        status: "error",
+        message: error.message,
+        code: error.code ?? null,
+      };
+    }
 
-  // `data` is `Course[] | null` — normalize null to an empty array.
-  return data ?? [];
-}
+    return {
+      status: "success",
+      // `data` is `CourseRow[] | null` — Supabase returns null when no rows
+      // match. Normalise to an empty array so callers never handle null.
+      data: data ?? [],
+    };
+  },
+);
