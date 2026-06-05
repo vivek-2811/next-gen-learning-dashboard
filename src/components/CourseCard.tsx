@@ -45,7 +45,10 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course }: CourseCardProps) {
-  const { title, progress, icon_name, created_at } = course;
+  const { title, icon_name, created_at } = course;
+  
+  // Clamp progress to 0–100 to handle any out-of-range database values
+  const progress = Math.min(Math.max(course.progress, 0), 100);
 
   // Resolve icon or fallback to BookOpen
   const IconComponent = iconMap[icon_name as keyof typeof iconMap] || BookOpen;

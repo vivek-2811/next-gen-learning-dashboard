@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Home,
   BookOpen,
@@ -15,14 +17,14 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 const navItems = [
-  { id: "dashboard", label: "Dashboard", icon: Home },
-  { id: "courses", label: "Courses", icon: BookOpen },
-  { id: "activity", label: "Activity", icon: Activity },
-  { id: "settings", label: "Settings", icon: Settings },
+  { id: "dashboard", label: "Dashboard", icon: Home, href: "/dashboard" },
+  { id: "courses", label: "Courses", icon: BookOpen, href: "/courses" },
+  { id: "activity", label: "Activity", icon: Activity, href: "/activity" },
+  { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ] as const;
 
 export default function Sidebar() {
-  const [activeId, setActiveId] = useState<string>("dashboard");
+  const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -131,74 +133,73 @@ export default function Sidebar() {
               aria-label="Main navigation"
             >
               {navItems.map((item) => {
-                const isActive = activeId === item.id;
+                const isActive = pathname === item.href;
                 const Icon = item.icon;
 
                 return (
-                  <motion.a
+                  <Link
                     key={item.id}
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setActiveId(item.id);
-                      setMobileOpen(false);
-                    }}
-                    whileHover={{ scale: 1.02, x: 2 }}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                    className={`
-                      relative flex items-center gap-3 px-3 py-2.5 rounded-xl
-                      text-sm font-semibold
-                      transition-colors duration-150 outline-none
-                      ${isActive
-                        ? "text-white"
-                        : "text-zinc-500 hover:text-zinc-200"
-                      }
-                    `}
-                    aria-current={isActive ? "page" : undefined}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
                   >
-                    {/* Active background indicator (shared layoutId) */}
-                    {isActive && (
-                      <motion.div
-                        layoutId="sidebar-active-bg"
-                        className="absolute inset-0 rounded-xl bg-white/[0.07] border border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
-                        transition={{
-                          type: "spring",
-                          stiffness: 350,
-                          damping: 30,
-                        }}
-                      />
-                    )}
-
-                    {/* Active left accent bar */}
-                    {isActive && (
-                      <motion.div
-                        layoutId="sidebar-active-bar"
-                        className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"
-                        transition={{
-                          type: "spring",
-                          stiffness: 350,
-                          damping: 30,
-                        }}
-                      />
-                    )}
-
-                    <Icon className="relative z-10 h-[18px] w-[18px] shrink-0" />
-
-                    <AnimatePresence>
-                      {!collapsed && (
-                        <motion.span
-                          initial={{ opacity: 0, x: -8 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -8 }}
-                          transition={{ duration: 0.12 }}
-                          className="relative z-10 whitespace-nowrap"
-                        >
-                          {item.label}
-                        </motion.span>
+                    <motion.div
+                      whileHover={{ scale: 1.02, x: 2 }}
+                      whileTap={{ scale: 0.97 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      className={`
+                        relative flex items-center gap-3 px-3 py-2.5 rounded-xl
+                        text-sm font-semibold
+                        transition-colors duration-150 outline-none cursor-pointer
+                        ${isActive
+                          ? "text-white"
+                          : "text-zinc-500 hover:text-zinc-200"
+                        }
+                      `}
+                      aria-current={isActive ? "page" : undefined}
+                    >
+                      {/* Active background indicator (shared layoutId) */}
+                      {isActive && (
+                        <motion.div
+                          layoutId="sidebar-active-bg"
+                          className="absolute inset-0 rounded-xl bg-white/[0.07] border border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
+                          transition={{
+                            type: "spring",
+                            stiffness: 350,
+                            damping: 30,
+                          }}
+                        />
                       )}
-                    </AnimatePresence>
-                  </motion.a>
+
+                      {/* Active left accent bar */}
+                      {isActive && (
+                        <motion.div
+                          layoutId="sidebar-active-bar"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+                          transition={{
+                            type: "spring",
+                            stiffness: 350,
+                            damping: 30,
+                          }}
+                        />
+                      )}
+
+                      <Icon className="relative z-10 h-[18px] w-[18px] shrink-0" />
+
+                      <AnimatePresence>
+                        {!collapsed && (
+                          <motion.span
+                            initial={{ opacity: 0, x: -8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -8 }}
+                            transition={{ duration: 0.12 }}
+                            className="relative z-10 whitespace-nowrap"
+                          >
+                            {item.label}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  </Link>
                 );
               })}
             </nav>

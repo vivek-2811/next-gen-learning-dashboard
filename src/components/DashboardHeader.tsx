@@ -16,14 +16,17 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ courses }: DashboardHeaderProps) {
+  // Clamp progress values to 0–100 to handle any out-of-range database values
+  const clamp = (v: number) => Math.min(Math.max(v, 0), 100);
+
   const totalCourses = courses.length;
   
-  const completedCourses = courses.filter((c) => c.progress === 100).length;
+  const completedCourses = courses.filter((c) => clamp(c.progress) === 100).length;
   
-  const inProgressCourses = courses.filter((c) => c.progress > 0 && c.progress < 100).length;
+  const inProgressCourses = courses.filter((c) => clamp(c.progress) > 0 && clamp(c.progress) < 100).length;
   
   const avgProgress = totalCourses 
-    ? Math.round(courses.reduce((sum, c) => sum + c.progress, 0) / totalCourses) 
+    ? Math.round(courses.reduce((sum, c) => sum + clamp(c.progress), 0) / totalCourses) 
     : 0;
 
   // Animation variants for statistics cards
