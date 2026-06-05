@@ -2,7 +2,12 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 // ---------------------------------------------------------------------------
-// Runtime environment validation — same pattern as client.ts / server.ts.
+// Route definitions
+// ---------------------------------------------------------------------------
+const PROTECTED_ROUTES = ["/dashboard", "/courses", "/activity", "/settings"];
+
+// ---------------------------------------------------------------------------
+// Runtime environment validation
 // ---------------------------------------------------------------------------
 function getEnvVars(): { url: string; anonKey: string } | null {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -21,24 +26,18 @@ function getEnvVars(): { url: string; anonKey: string } | null {
 }
 
 /**
- * Refreshes the Supabase auth session on every request.
+ * Refreshes the Supabase auth session on every request and enforces
+ * route-level authentication.
  *
- * This helper MUST be called from `src/proxy.ts` on every matched route.
- * Without it, the server-side session will expire and users will be
- * unexpectedly logged out.
+ * - Public routes (/, /login, /signup): accessible to everyone.
+ * - Protected routes (/dashboard, /courses, /activity, /settings):
+ *   redirect to /login if the user has no valid session.
+ * - Authenticated users visiting /login or /signup are redirected to /dashboard.
  *
- * What it does:
- *   1. Reads the current session cookie from the incoming request.
- *   2. Calls `supabase.auth.getUser()` which transparently refreshes an
- *      expired access token using the stored refresh token.
- *   3. Writes any updated cookies (new access/refresh tokens) onto the
- *      outgoing response so the browser receives them.
- *
- * @param request - The incoming Next.js proxy/middleware request object.
- * @returns A NextResponse with refreshed auth cookies applied.
+ * @param request - The incoming Next.js proxy request object.
+ * @returns A NextResponse — either pass-through, or a redirect.
  */
 export async function updateSession(request: NextRequest): Promise<NextResponse> {
-  // Start with a pass-through response that we will mutate.
   let supabaseResponse = NextResponse.next({ request });
 
   const env = getEnvVars();
@@ -54,14 +53,10 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
         return request.cookies.getAll();
       },
       setAll(cookiesToSet) {
-        // First, write cookies back onto the request so subsequent
-        // server-side reads in this same request see the updated values.
         cookiesToSet.forEach(({ name, value }) => {
           request.cookies.set(name, value);
         });
 
-        // Recreate the response to include the mutated request cookies,
-        // then also set them on the response so the browser receives them.
         supabaseResponse = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) => {
           supabaseResponse.cookies.set(name, value, options);
@@ -71,9 +66,32 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
   });
 
   // CRITICAL: Do not add logic between createServerClient and getUser().
-  // A seemingly innocent early return could prevent the token refresh from
-  // writing back to the browser, causing a subtle auth desync bug.
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+
+  // ── Redirect unauthenticated users away from protected routes ──
+  const isProtected = PROTECTED_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + "/")
+  );
+
+  if (isProtected && !user) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    loginUrl.searchParams.set("redirectTo", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // ── Redirect authenticated users away from auth pages ──
+  const isAuthPage = pathname === "/login" || pathname === "/signup";
+
+  if (isAuthPage && user) {
+    const dashboardUrl = request.nextUrl.clone();
+    dashboardUrl.pathname = "/dashboard";
+    return NextResponse.redirect(dashboardUrl);
+  }
 
   return supabaseResponse;
 }

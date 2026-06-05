@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import LogoutButton from "@/components/auth/LogoutButton";
 
 const navItems = [
   { id: "dashboard", label: "Dashboard", icon: Home, href: "/dashboard" },
@@ -205,7 +206,13 @@ export default function Sidebar() {
             </nav>
 
             {/* ── Footer ── */}
-            <div className="px-4 pb-6 pt-4 border-t border-white/[0.05]">
+            <div className="px-4 pb-6 pt-4 border-t border-white/[0.05] space-y-3">
+              {/* Logout button */}
+              <div className="px-0">
+                <LogoutButton collapsed={collapsed} />
+              </div>
+
+              {/* User info */}
               <div className="flex items-center gap-3 overflow-hidden">
                 <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-[11px] font-black text-white shadow-md shadow-emerald-500/20">
                   V
