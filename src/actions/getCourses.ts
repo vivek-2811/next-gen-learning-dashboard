@@ -39,7 +39,6 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
           title,
           progress,
           icon_name,
-          category,
           created_at
         `)
         .order("created_at", { ascending: false });
@@ -65,18 +64,32 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
         title: string;
         progress: number;
         icon_name: string;
-        category: string;
         created_at: string;
       }>;
 
       const mappedCourses: Course[] = (rawData ?? []).map((row) => {
+        // Dynamically map category to satisfy the TypeScript Course interface and UI filtering
+        let category: Course["category"] = "Frontend";
+        const icon = (row.icon_name || "").toLowerCase();
+        const title = (row.title || "").toLowerCase();
+
+        if (icon === "database" || title.includes("database") || title.includes("supabase")) {
+          category = "Backend";
+        } else if (icon === "cpu" || title.includes("neural") || title.includes("ai") || title.includes("learning")) {
+          category = "AI";
+        } else if (icon === "shield" || title.includes("ci/cd") || title.includes("devops") || title.includes("pipelines")) {
+          category = "DevOps";
+        } else if (icon === "calculator" || title.includes("data structures") || title.includes("algorithms") || title.includes("dsa")) {
+          category = "DSA";
+        }
+
         return {
           id: row.id,
           title: row.title,
           progress: row.progress,
           icon_name: row.icon_name,
           created_at: row.created_at,
-          category: row.category as Course["category"],
+          category,
         };
       });
 
