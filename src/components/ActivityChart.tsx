@@ -1,9 +1,16 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { BarChart3, TrendingUp, Flame } from "lucide-react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BarChart3, TrendingUp, Flame, Clock, BookOpen } from "lucide-react";
 
-const weekData = [
+interface DayData {
+  day: string;
+  hours: number;
+  lessons: number;
+}
+
+const weekData: DayData[] = [
   { day: "Mon", hours: 3.2, lessons: 5 },
   { day: "Tue", hours: 5.1, lessons: 8 },
   { day: "Wed", hours: 2.0, lessons: 3 },
@@ -20,6 +27,8 @@ const avgHours = +(totalHours / 7).toFixed(1);
 const bestDay = weekData.reduce((best, d) => (d.hours > best.hours ? d : best));
 
 export default function ActivityChart() {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -30,7 +39,7 @@ export default function ActivityChart() {
       {/* Subtle top gradient accent */}
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
 
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/15 text-blue-400">
@@ -46,7 +55,7 @@ export default function ActivityChart() {
           </div>
         </div>
 
-        {/* ── Summary pills ── */}
+        {/* Summary pills */}
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800/70 border border-zinc-700/40 text-xs font-bold text-zinc-300">
             <Flame className="h-3.5 w-3.5 text-orange-400" />
@@ -59,74 +68,108 @@ export default function ActivityChart() {
         </div>
       </div>
 
-      {/* ── Chart area ── */}
-      <div className="flex items-end justify-between gap-2 sm:gap-3 h-48 sm:h-56 px-1">
-        {weekData.map((item, i) => {
-          const heightPct = (item.hours / maxHours) * 100;
-          const isMax = item.day === bestDay.day;
-
-          return (
-            <div
-              key={item.day}
-              className="flex-1 flex flex-col items-center gap-2 min-w-0"
-            >
-              {/* Hour label on top */}
-              <motion.span
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 + i * 0.06, duration: 0.3 }}
-                className={`text-[10px] sm:text-xs font-bold tabular-nums ${
-                  isMax ? "text-blue-400" : "text-zinc-500"
-                }`}
-              >
-                {item.hours}h
-              </motion.span>
-
-              {/* Bar container */}
-              <div className="relative w-full flex justify-center h-full">
-                <div className="relative w-6 sm:w-8 md:w-10 h-full flex items-end">
-                  {/* Background track */}
-                  <div className="absolute inset-0 rounded-lg bg-zinc-800/40 border border-zinc-800/30" />
-
-                  {/* Animated fill */}
-                  <motion.div
-                    initial={{ height: 0 }}
-                    animate={{ height: `${heightPct}%` }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 180,
-                      damping: 20,
-                      delay: 0.15 + i * 0.07,
-                    }}
-                    className={`relative w-full rounded-lg ${
-                      isMax
-                        ? "bg-gradient-to-t from-blue-600 to-blue-400 shadow-lg shadow-blue-500/20"
-                        : "bg-gradient-to-t from-blue-600/60 to-blue-500/40"
-                    }`}
-                  >
-                    {/* Glossy highlight */}
-                    <div className="absolute inset-x-0 top-0 h-1/3 rounded-t-lg bg-gradient-to-b from-white/[0.08] to-transparent" />
-                  </motion.div>
-                </div>
-              </div>
-
-              {/* Day label */}
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 + i * 0.05 }}
-                className={`text-[10px] sm:text-xs font-bold ${
-                  isMax ? "text-blue-400" : "text-zinc-500"
-                }`}
-              >
-                {item.day}
-              </motion.span>
+      {/* Chart Area */}
+      <div className="relative flex items-end justify-between gap-2 sm:gap-3 h-48 sm:h-56 px-1 mb-4">
+        {/* Y-Axis Gridlines */}
+        <div className="absolute inset-0 flex flex-col justify-between pointer-events-none py-6 pl-8">
+          {[0, 1, 2, 3].map((val) => (
+            <div key={val} className="w-full flex items-center gap-2">
+              <span className="text-[9px] font-mono text-zinc-600 select-none w-6 text-right">
+                {((maxHours / 3) * (3 - val)).toFixed(1)}h
+              </span>
+              <div className="flex-1 border-t border-dashed border-zinc-800/60" />
             </div>
-          );
-        })}
+          ))}
+        </div>
+
+        {/* Chart Bars */}
+        <div className="relative flex items-end justify-between w-full h-full pl-10 z-10">
+          {weekData.map((item, i) => {
+            const heightPct = (item.hours / maxHours) * 85; // cap at 85% to leave room for labels/padding
+            const isMax = item.day === bestDay.day;
+
+            return (
+              <div
+                key={item.day}
+                className="flex-1 flex flex-col items-center gap-2 min-w-0 h-full justify-end relative"
+                onMouseEnter={() => setHoveredIndex(i)}
+                onMouseLeave={() => setHoveredIndex(null)}
+              >
+                {/* Custom Hover Tooltip */}
+                <AnimatePresence>
+                  {hoveredIndex === i && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: -12, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      style={{ bottom: `${heightPct}%` }}
+                      className="absolute z-20 bg-zinc-950/90 border border-white/10 px-3 py-2 rounded-xl shadow-xl pointer-events-none flex flex-col gap-1 min-w-[105px] items-center text-center"
+                    >
+                      <p className="text-[9px] text-zinc-400 font-extrabold uppercase tracking-wider">
+                        {item.day} Stats
+                      </p>
+                      <div className="flex items-center gap-1 text-xs text-white font-bold">
+                        <Clock className="h-3 w-3 text-blue-400" />
+                        <span>{item.hours}h</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-white font-bold">
+                        <BookOpen className="h-3 w-3 text-purple-400" />
+                        <span>{item.lessons} lessons</span>
+                      </div>
+                      {/* Downward pointing arrow */}
+                      <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-zinc-950 border-r border-b border-white/10 rotate-45" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Bar Container */}
+                <div className="relative w-full flex justify-center h-full items-end">
+                  <div className="relative w-6 sm:w-8 md:w-10 h-full flex items-end">
+                    {/* Background track */}
+                    <div className="absolute inset-0 rounded-lg bg-zinc-800/20 border border-zinc-800/10" />
+
+                    {/* Animated Fill (GPU-accelerated scaleY) */}
+                    <motion.div
+                      initial={{ scaleY: 0 }}
+                      animate={{ scaleY: 1 }}
+                      style={{
+                        transformOrigin: "bottom",
+                        height: `${heightPct}%`,
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 180,
+                        damping: 20,
+                        delay: 0.15 + i * 0.07,
+                      }}
+                      className={`relative w-full rounded-lg transition-colors duration-200 cursor-pointer ${
+                        isMax
+                          ? "bg-gradient-to-t from-blue-600 via-cyan-500 to-cyan-400 shadow-lg shadow-cyan-500/25 border border-cyan-400/20"
+                          : "bg-gradient-to-t from-blue-600/70 to-blue-500/50 hover:from-blue-600/90 hover:to-blue-500/70 border border-blue-500/10"
+                      }`}
+                    >
+                      {/* Glossy top highlight */}
+                      <div className="absolute inset-x-0 top-0 h-1 rounded-t-lg bg-white/20" />
+                    </motion.div>
+                  </div>
+                </div>
+
+                {/* Day Label */}
+                <span
+                  className={`text-[10px] sm:text-xs font-bold mt-1 transition-colors duration-200 ${
+                    isMax || hoveredIndex === i ? "text-cyan-400 font-extrabold" : "text-zinc-500"
+                  }`}
+                >
+                  {item.day}
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* ── Bottom stats row ── */}
+      {/* Bottom stats row */}
       <div className="mt-8 pt-5 border-t border-white/[0.05] grid grid-cols-3 gap-4">
         <div className="text-center sm:text-left">
           <p className="text-[10px] uppercase tracking-widest text-zinc-600 font-bold">
@@ -142,7 +185,7 @@ export default function ActivityChart() {
           </p>
           <p className="text-lg sm:text-xl font-black text-white mt-0.5">
             {bestDay.day}{" "}
-            <span className="text-xs text-blue-400 font-bold">
+            <span className="text-xs text-cyan-400 font-bold font-mono">
               {bestDay.hours}h
             </span>
           </p>
