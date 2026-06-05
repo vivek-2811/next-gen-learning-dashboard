@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { Eye, EyeOff, Loader2, Lock, Mail, User, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { useToast } from "@/providers/ToastProvider";
 
 export default function SignupForm() {
   const router = useRouter();
   const supabase = createClient();
+  const { showToast } = useToast();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,6 +25,7 @@ export default function SignupForm() {
 
     if (!name.trim()) {
       setError("Full name is required.");
+      showToast("Full name is required.", "error");
       return false;
     }
 
@@ -30,19 +33,23 @@ export default function SignupForm() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       setError("Email address is required.");
+      showToast("Email address is required.", "error");
       return false;
     }
     if (!emailRegex.test(email)) {
       setError("Please enter a valid email address.");
+      showToast("Please enter a valid email address.", "error");
       return false;
     }
 
     if (!password) {
       setError("Password is required.");
+      showToast("Password is required.", "error");
       return false;
     }
     if (password.length < 6) {
       setError("Password must be at least 6 characters.");
+      showToast("Password must be at least 6 characters.", "error");
       return false;
     }
 
@@ -69,20 +76,22 @@ export default function SignupForm() {
 
       if (authError) {
         // Map common errors or use Supabase message
+        let message = `Registration failed: ${authError.message}`;
         if (
           authError.status === 422 ||
           authError.message.toLowerCase().includes("already registered") ||
           authError.message.toLowerCase().includes("already exists")
         ) {
-          setError("Account already exists. Please log in instead.");
-        } else {
-          setError(`Registration failed: ${authError.message}`);
+          message = "Account already exists. Please log in instead.";
         }
+        setError(message);
+        showToast(message, "error");
         setLoading(false);
         return;
       }
 
       setSuccess(true);
+      showToast("Account created successfully!", "success");
       setLoading(false);
 
       // Delay redirect to allow user to see success state
@@ -92,6 +101,7 @@ export default function SignupForm() {
 
     } catch {
       setError("An unexpected error occurred. Please try again.");
+      showToast("An unexpected error occurred. Please try again.", "error");
       setLoading(false);
     }
   };
@@ -103,12 +113,12 @@ export default function SignupForm() {
         animate={{ opacity: 1, scale: 1 }}
         className="text-center py-6 space-y-4"
       >
-        <div className="mx-auto w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+        <div className="mx-auto w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 dark:text-emerald-400">
           <CheckCircle2 className="h-6 w-6 animate-pulse" />
         </div>
         <div className="space-y-1.5">
-          <h3 className="text-base font-bold text-white">Account Created!</h3>
-          <p className="text-xs text-zinc-400 leading-relaxed max-w-xs mx-auto">
+          <h3 className="text-base font-bold text-zinc-900 dark:text-white">Account Created!</h3>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-xs mx-auto">
             Your account has been registered successfully. Redirecting you to the login page...
           </p>
         </div>
@@ -122,7 +132,7 @@ export default function SignupForm() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-start gap-3 text-red-400 text-xs font-semibold"
+          className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-start gap-3 text-red-650 dark:text-red-400 text-xs font-semibold"
         >
           <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
           <span>{error}</span>
@@ -130,58 +140,58 @@ export default function SignupForm() {
       )}
 
       <div className="space-y-2">
-        <label className="text-xs font-bold text-zinc-400 tracking-wider uppercase">
+        <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase">
           Full Name
         </label>
         <div className="relative">
-          <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-zinc-500" />
+          <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-zinc-400 dark:text-zinc-500" />
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             disabled={loading}
             placeholder="John Doe"
-            className="w-full pl-11 pr-4 py-3 bg-zinc-950/50 border border-zinc-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 rounded-xl text-sm text-zinc-100 placeholder:text-zinc-650 outline-none transition-all disabled:opacity-50"
+            className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 rounded-xl text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-650 outline-none transition-all disabled:opacity-50"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs font-bold text-zinc-400 tracking-wider uppercase">
+        <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase">
           Email Address
         </label>
         <div className="relative">
-          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-zinc-500" />
+          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-zinc-400 dark:text-zinc-500" />
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={loading}
             placeholder="name@example.com"
-            className="w-full pl-11 pr-4 py-3 bg-zinc-950/50 border border-zinc-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 rounded-xl text-sm text-zinc-100 placeholder:text-zinc-650 outline-none transition-all disabled:opacity-50"
+            className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 rounded-xl text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-650 outline-none transition-all disabled:opacity-50"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs font-bold text-zinc-400 tracking-wider uppercase">
+        <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase">
           Password
         </label>
         <div className="relative">
-          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-zinc-500" />
+          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-zinc-400 dark:text-zinc-500" />
           <input
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
             placeholder="••••••••"
-            className="w-full pl-11 pr-11 py-3 bg-zinc-950/50 border border-zinc-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 rounded-xl text-sm text-zinc-100 placeholder:text-zinc-650 outline-none transition-all disabled:opacity-50"
+            className="w-full pl-11 pr-11 py-3 bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 rounded-xl text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-650 outline-none transition-all disabled:opacity-50"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             disabled={loading}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
           >
             {showPassword ? (
               <EyeOff className="h-4.5 w-4.5" />

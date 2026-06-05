@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FolderOpen, SearchX } from "lucide-react";
 import { DashboardHeader } from "@/components/DashboardHeader";
@@ -9,6 +9,8 @@ import HeroCard from "@/components/HeroCard";
 import ActivityChart from "@/components/ActivityChart";
 import { CategoryFilter, Category } from "@/components/CategoryFilter";
 import SearchBar from "@/components/SearchBar";
+import { SkeletonCard, SkeletonStats, SkeletonChart } from "@/components/Skeleton";
+import { useToast } from "@/providers/ToastProvider";
 import type { Course } from "@/types/course";
 import type { DayActivity } from "@/actions/getActivityLogs";
 
@@ -21,6 +23,16 @@ interface DashboardContentProps {
 export function DashboardContent({ initialCourses, userName, activityData }: DashboardContentProps) {
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      showToast(`Welcome back, ${userName}!`, "success");
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [userName, showToast]);
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
@@ -43,6 +55,25 @@ export function DashboardContent({ initialCourses, userName, activityData }: Das
 
     return categoryMatch && (titleMatch || categoryStringMatch);
   });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8 w-full">
+        {/* Stats and Welcome Card Skeleton */}
+        <SkeletonStats />
+        
+        {/* Chart Skeleton */}
+        <SkeletonChart />
+
+        {/* Course Grid Skeletons */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 w-full">
@@ -72,13 +103,13 @@ export function DashboardContent({ initialCourses, userName, activityData }: Das
       <div className="w-full">
         {initialCourses.length === 0 ? (
           /* Enrolled Empty State */
-          <div className="max-w-md text-center py-16 px-6 bg-zinc-900/20 border border-zinc-800/40 rounded-3xl backdrop-blur-sm space-y-5">
-            <div className="mx-auto w-12 h-12 rounded-2xl bg-zinc-800/80 flex items-center justify-center border border-zinc-700/30 text-zinc-400">
+          <div className="max-w-md mx-auto text-center py-16 px-6 bg-white dark:bg-zinc-900/20 border border-zinc-200 dark:border-zinc-800/40 rounded-3xl backdrop-blur-sm space-y-5 shadow-sm">
+            <div className="mx-auto w-12 h-12 rounded-2xl bg-zinc-150 dark:bg-zinc-800/80 flex items-center justify-center border border-zinc-200 dark:border-zinc-700/30 text-zinc-505 dark:text-zinc-400">
               <FolderOpen className="h-6 w-6" />
             </div>
             <div className="space-y-1.5">
-              <h3 className="text-base font-bold text-white">No Courses Available</h3>
-              <p className="text-xs text-zinc-400 leading-relaxed">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-white">No Courses Available</h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-sm mx-auto">
                 We couldn&apos;t find any records in your courses profile. Add some rows in Supabase to see them displayed here.
               </p>
             </div>
@@ -101,16 +132,16 @@ export function DashboardContent({ initialCourses, userName, activityData }: Das
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="flex flex-col items-center justify-center py-16 space-y-4 bg-zinc-900/20 border border-zinc-800/40 rounded-3xl backdrop-blur-sm"
+              className="flex flex-col items-center justify-center py-16 space-y-4 bg-white dark:bg-zinc-900/20 border border-zinc-200 dark:border-zinc-800/40 rounded-3xl backdrop-blur-sm shadow-sm"
             >
-              <div className="w-14 h-14 rounded-2xl bg-zinc-800/60 border border-zinc-700/30 flex items-center justify-center text-zinc-500">
+              <div className="w-14 h-14 rounded-2xl bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-250 dark:border-zinc-700/30 flex items-center justify-center text-zinc-405 dark:text-zinc-500">
                 <SearchX className="h-7 w-7" />
               </div>
               <div className="text-center space-y-1.5 max-w-xs px-4">
-                <h4 className="text-base font-bold text-white">
+                <h4 className="text-base font-bold text-zinc-900 dark:text-white">
                   No courses found
                 </h4>
-                <p className="text-xs text-zinc-500 leading-relaxed">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
                   No courses match your active search queries or category filters. Try resetting the filters or clearing the search query.
                 </p>
               </div>

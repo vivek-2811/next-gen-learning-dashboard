@@ -56,7 +56,7 @@ export default function Sidebar() {
       {/* ── Mobile hamburger toggle ── */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed top-5 left-5 z-50 p-2.5 rounded-xl bg-zinc-900/90 border border-zinc-800/60 text-zinc-300 backdrop-blur-md md:hidden"
+        className="fixed top-5 left-5 z-50 p-2.5 rounded-xl bg-zinc-900/90 border border-zinc-800/60 text-zinc-300 backdrop-blur-md md:hidden outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         aria-label="Open navigation"
       >
         <Menu className="h-5 w-5" />
@@ -137,7 +137,7 @@ export default function Sidebar() {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.92 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className="p-2 rounded-xl text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/60 transition-colors"
+                className="p-2 rounded-xl text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/60 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               >
                 {collapsed ? (
@@ -162,7 +162,7 @@ export default function Sidebar() {
                     key={item.id}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
-                    className="w-full block outline-none"
+                    className="w-full block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                   >
                     <motion.div
                       whileHover={{ scale: 1.02, x: 2 }}
