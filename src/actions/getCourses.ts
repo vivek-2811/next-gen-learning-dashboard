@@ -31,7 +31,7 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
         };
       }
 
-      // Query user-specific courses, joining the course title and icon metadata
+      // Query user-specific courses, joining the course title, icon, and category metadata
       const { data, error } = await supabase
         .from("user_courses")
         .select(`
@@ -40,7 +40,8 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
           courses (
             id,
             title,
-            icon_name
+            icon_name,
+            category
           )
         `)
         .eq("user_id", user.id)
@@ -69,6 +70,7 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
           id: string;
           title: string;
           icon_name: string;
+          category: string;
         } | null;
       }>;
 
@@ -82,6 +84,7 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
             progress: row.progress,
             icon_name: c.icon_name,
             created_at: row.created_at,
+            category: c.category as Course["category"],
           };
         });
 

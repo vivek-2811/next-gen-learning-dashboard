@@ -30,6 +30,8 @@ export interface Course {
   icon_name: string;
   /** ISO 8601 UTC timestamp string. */
   created_at: string;
+  /** Course category for filtering. */
+  category: "Frontend" | "Backend" | "AI" | "DevOps" | "DSA";
 }
 
 // ---------------------------------------------------------------------------

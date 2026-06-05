@@ -4,17 +4,13 @@ import {
   AlertCircle, 
   RefreshCw, 
   Database, 
-  HelpCircle,
-  FolderOpen
+  HelpCircle
 } from "lucide-react";
 import { getCourses } from "@/actions/getCourses";
 import { getProfile } from "@/actions/getProfile";
 import { getActivityLogs } from "@/actions/getActivityLogs";
-import { DashboardHeader } from "@/components/DashboardHeader";
-import { CourseGrid } from "@/components/CourseGrid";
 import Sidebar from "@/components/Sidebar";
-import HeroCard from "@/components/HeroCard";
-import ActivityChart from "@/components/ActivityChart";
+import { DashboardContent } from "@/components/dashboard/DashboardContent";
 
 // Force Next.js to treat this route as dynamically rendered at runtime,
 // since it relies on server actions/cookies and RLS data fetching.
@@ -32,8 +28,6 @@ export default async function DashboardPage() {
       ? profileResult.data.full_name
       : "Learner";
 
-  const activeCoursesCount = result.status === "success" ? result.data.length : 0;
-
   return (
     <div className="flex min-h-screen bg-black text-zinc-100 selection:bg-blue-500/30">
       {/* Sidebar Component */}
@@ -41,11 +35,8 @@ export default async function DashboardPage() {
 
       {/* Main dashboard content container */}
       <main className="flex-1 p-8 space-y-8 overflow-y-auto max-w-7xl">
-        {/* Welcome greeting card */}
-        <HeroCard userName={userName} activeCoursesCount={activeCoursesCount} />
-
         {/* Render Error State */}
-        {result.status === "error" && (
+        {result.status === "error" ? (
           <div className="space-y-6 max-w-2xl py-4">
             <div className="bg-zinc-900/80 border border-red-500/20 rounded-3xl p-8 backdrop-blur-md relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red-500/50 via-rose-500/50 to-red-500/50" />
@@ -111,46 +102,13 @@ export default async function DashboardPage() {
               </div>
             </div>
           </div>
-        )}
-
-        {/* Render Success State */}
-        {result.status === "success" && (
-          <div className="space-y-8 w-full">
-            {/* Overall course stats */}
-            <DashboardHeader courses={result.data} />
-            
-            {/* Learning chart */}
-            <ActivityChart data={activityData} />
-
-            {/* Course cards list */}
-            {result.data.length === 0 ? (
-              /* Empty State */
-              <div className="max-w-md text-center py-16 px-6 bg-zinc-900/20 border border-zinc-800/40 rounded-3xl backdrop-blur-sm space-y-5">
-                <div className="mx-auto w-12 h-12 rounded-2xl bg-zinc-800/80 flex items-center justify-center border border-zinc-700/30 text-zinc-400">
-                  <FolderOpen className="h-6 w-6" />
-                </div>
-                <div className="space-y-1.5">
-                  <h3 className="text-base font-bold text-white">No Courses Available</h3>
-                  <p className="text-xs text-zinc-400 leading-relaxed">
-                    We couldn&apos;t find any records in your <code className="bg-zinc-850 px-1 py-0.5 rounded font-mono text-zinc-300">courses</code> table. Add some rows in Supabase to see them displayed here.
-                  </p>
-                </div>
-                <div className="pt-2">
-                  <a
-                    href="https://supabase.com/dashboard"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white rounded-xl shadow-md shadow-blue-600/10 transition-colors"
-                  >
-                    Open Supabase Dashboard
-                  </a>
-                </div>
-              </div>
-            ) : (
-              /* Staggered Course List */
-              <CourseGrid courses={result.data} />
-            )}
-          </div>
+        ) : (
+          /* Render Success State Wrapper */
+          <DashboardContent
+            initialCourses={result.data}
+            userName={userName}
+            activityData={activityData}
+          />
         )}
       </main>
     </div>

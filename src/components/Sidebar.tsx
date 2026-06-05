@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import LogoutButton from "@/components/auth/LogoutButton";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const navItems = [
   { id: "dashboard", label: "Dashboard", icon: Home, href: "/dashboard" },
@@ -88,7 +89,6 @@ export default function Sidebar() {
               bg-zinc-950/95 backdrop-blur-xl
               border-r border-white/[0.06]
               flex flex-col
-              overflow-hidden
               ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
             `}
             style={{ width: sidebarWidth }}
@@ -129,8 +129,9 @@ export default function Sidebar() {
               </button>
             </div>
 
-            {/* ── Collapse toggle (desktop only) ── */}
-            <div className="hidden md:flex justify-end px-3 py-2">
+            {/* ── Collapse toggle + Theme toggle (desktop only) ── */}
+            <div className={`hidden md:flex items-center ${collapsed ? "flex-col gap-2" : "justify-between"} px-3 py-2`}>
+              <ThemeToggle />
               <motion.button
                 onClick={() => setCollapsed((c) => !c)}
                 whileHover={{ scale: 1.1 }}
