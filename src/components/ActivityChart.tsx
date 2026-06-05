@@ -133,6 +133,10 @@ export default function ActivityChart() {
                     <motion.div
                       initial={{ scaleY: 0 }}
                       animate={{ scaleY: 1 }}
+                      whileHover={{ 
+                        scale: 1.05,
+                        filter: "brightness(1.15)",
+                      }}
                       style={{
                         transformOrigin: "bottom",
                         height: `${heightPct}%`,
@@ -143,10 +147,10 @@ export default function ActivityChart() {
                         damping: 20,
                         delay: 0.15 + i * 0.07,
                       }}
-                      className={`relative w-full rounded-lg transition-colors duration-200 cursor-pointer ${
+                      className={`relative w-full rounded-lg transition-all duration-200 cursor-pointer ${
                         isMax
-                          ? "bg-gradient-to-t from-blue-600 via-cyan-500 to-cyan-400 shadow-lg shadow-cyan-500/25 border border-cyan-400/20"
-                          : "bg-gradient-to-t from-blue-600/70 to-blue-500/50 hover:from-blue-600/90 hover:to-blue-500/70 border border-blue-500/10"
+                          ? "bg-gradient-to-t from-blue-600 via-cyan-500 to-cyan-400 shadow-lg shadow-cyan-500/30 border border-cyan-400/30"
+                          : "bg-gradient-to-t from-blue-600/70 to-blue-500/50 border border-blue-500/20"
                       }`}
                     >
                       {/* Glossy top highlight */}
@@ -170,7 +174,12 @@ export default function ActivityChart() {
       </div>
 
       {/* Bottom stats row */}
-      <div className="mt-8 pt-5 border-t border-white/[0.05] grid grid-cols-3 gap-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+        className="mt-8 pt-5 border-t border-white/[0.05] grid grid-cols-3 gap-4"
+      >
         <div className="text-center sm:text-left">
           <p className="text-[10px] uppercase tracking-widest text-zinc-600 font-bold">
             Lessons
@@ -198,7 +207,7 @@ export default function ActivityChart() {
             On Track
           </p>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
