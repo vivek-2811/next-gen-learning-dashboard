@@ -43,6 +43,8 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
         `)
         .order("created_at", { ascending: false });
 
+      console.log("RAW DATA:", data);
+
       if (error) {
         console.error("[getCourses] Query failed:", {
           code: error.code,
@@ -92,6 +94,8 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
           category,
         };
       });
+
+      console.log("COURSES FOUND:", mappedCourses);
 
       return {
         status: "success",
