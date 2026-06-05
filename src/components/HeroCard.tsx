@@ -6,7 +6,7 @@ export default function HeroCard() {
       </h1>
 
       <p className="mt-3 text-zinc-400">
-        You're making great progress.
+        {"You're making great progress."}
       </p>
 
       <div className="mt-6 flex gap-6">

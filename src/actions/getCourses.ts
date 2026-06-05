@@ -74,7 +74,7 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
         status: "success",
         data: data ?? [],
       };
-    } catch (err: any) {
+    } catch (err) {
       console.error("[getCourses] Initialization or Query threw error:", err);
       
       return {
