@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
 import { 
-  ArrowLeft, 
   AlertCircle, 
   RefreshCw, 
   Database, 
@@ -11,6 +10,9 @@ import {
 import { getCourses } from "@/actions/getCourses";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { CourseGrid } from "@/components/CourseGrid";
+import Sidebar from "@/components/Sidebar";
+import HeroCard from "@/components/HeroCard";
+import ActivityChart from "@/components/ActivityChart";
 
 // Force Next.js to treat this route as dynamically rendered at runtime,
 // since it relies on server actions/cookies and RLS data fetching.
@@ -20,36 +22,18 @@ export default async function DashboardPage() {
   const result = await getCourses();
 
   return (
-    <main className="min-h-screen bg-black text-zinc-100 flex flex-col selection:bg-blue-500/30">
-      {/* Navigation top header */}
-      <nav className="border-b border-zinc-900/60 bg-zinc-950/45 backdrop-blur-md sticky top-0 z-30 w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link 
-            href="/" 
-            className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white font-medium transition-colors group"
-          >
-            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            Back to Home
-          </Link>
-          <div className="flex items-center gap-4">
-            <a 
-              href="https://supabase.com" 
-              target="_blank" 
-              rel="noreferrer" 
-              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors hidden sm:inline"
-            >
-              Supabase Docs
-            </a>
-          </div>
-        </div>
-      </nav>
+    <div className="flex min-h-screen bg-black text-zinc-100 selection:bg-blue-500/30">
+      {/* Sidebar Component */}
+      <Sidebar />
 
       {/* Main dashboard content container */}
-      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-10">
-        
+      <main className="flex-1 p-8 space-y-8 overflow-y-auto max-w-7xl">
+        {/* Welcome greeting card */}
+        <HeroCard />
+
         {/* Render Error State */}
         {result.status === "error" && (
-          <div className="space-y-6 max-w-2xl mx-auto py-8">
+          <div className="space-y-6 max-w-2xl py-4">
             <div className="bg-zinc-900/80 border border-red-500/20 rounded-3xl p-8 backdrop-blur-md relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red-500/50 via-rose-500/50 to-red-500/50" />
               
@@ -118,12 +102,17 @@ export default async function DashboardPage() {
 
         {/* Render Success State */}
         {result.status === "success" && (
-          <div className="space-y-10 w-full">
+          <div className="space-y-8 w-full">
+            {/* Overall course stats */}
             <DashboardHeader courses={result.data} />
             
+            {/* Learning chart */}
+            <ActivityChart />
+
+            {/* Course cards list */}
             {result.data.length === 0 ? (
               /* Empty State */
-              <div className="max-w-md mx-auto text-center py-16 px-6 bg-zinc-900/20 border border-zinc-800/40 rounded-3xl backdrop-blur-sm space-y-5">
+              <div className="max-w-md text-center py-16 px-6 bg-zinc-900/20 border border-zinc-800/40 rounded-3xl backdrop-blur-sm space-y-5">
                 <div className="mx-auto w-12 h-12 rounded-2xl bg-zinc-800/80 flex items-center justify-center border border-zinc-700/30 text-zinc-400">
                   <FolderOpen className="h-6 w-6" />
                 </div>
@@ -150,8 +139,7 @@ export default async function DashboardPage() {
             )}
           </div>
         )}
-
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
