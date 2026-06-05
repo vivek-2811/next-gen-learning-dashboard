@@ -49,3 +49,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 Vercel URL:
 https://next-gen-learning-dashboard-vivek2811.vercel.app
+
+## Screenshots
+
+![Dashboard](public/screenshots/dashboard.png)
