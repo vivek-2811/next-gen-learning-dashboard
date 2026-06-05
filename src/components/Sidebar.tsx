@@ -84,7 +84,7 @@ export default function Sidebar() {
             animate={{ x: 0, width: sidebarWidth }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className={`
-              fixed md:sticky top-0 left-0 z-50 md:z-auto
+              fixed md:sticky top-0 left-0 z-50 md:z-30
               min-h-screen h-screen
               bg-zinc-950/95 backdrop-blur-xl
               border-r border-white/[0.06]
@@ -162,6 +162,7 @@ export default function Sidebar() {
                     key={item.id}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
+                    className="w-full block outline-none"
                   >
                     <motion.div
                       whileHover={{ scale: 1.02, x: 2 }}

@@ -2,12 +2,12 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  GraduationCap, 
-  Award, 
-  Clock, 
-  TrendingUp, 
-  BookOpenCheck 
+import {
+  GraduationCap,
+  Award,
+  Clock,
+  TrendingUp,
+  BookOpenCheck
 } from "lucide-react";
 import type { Course } from "@/types/course";
 
@@ -20,13 +20,13 @@ export function DashboardHeader({ courses }: DashboardHeaderProps) {
   const clamp = (v: number) => Math.min(Math.max(v, 0), 100);
 
   const totalCourses = courses.length;
-  
+
   const completedCourses = courses.filter((c) => clamp(c.progress) === 100).length;
-  
+
   const inProgressCourses = courses.filter((c) => clamp(c.progress) > 0 && clamp(c.progress) < 100).length;
-  
-  const avgProgress = totalCourses 
-    ? Math.round(courses.reduce((sum, c) => sum + clamp(c.progress), 0) / totalCourses) 
+
+  const avgProgress = totalCourses
+    ? Math.round(courses.reduce((sum, c) => sum + clamp(c.progress), 0) / totalCourses)
     : 0;
 
   // Animation variants for statistics cards

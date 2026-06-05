@@ -33,11 +33,10 @@ export function CategoryFilter({ selectedCategories, onChange }: CategoryFilterP
         </span>
         <button
           onClick={handleClear}
-          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            selectedCategories.length === 0
+          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${selectedCategories.length === 0
               ? "bg-blue-600 text-white shadow-md shadow-blue-600/10"
               : "bg-zinc-800/60 text-zinc-400 hover:text-zinc-200 border border-zinc-700/20"
-          }`}
+            }`}
         >
           All
         </button>
@@ -49,18 +48,17 @@ export function CategoryFilter({ selectedCategories, onChange }: CategoryFilterP
               onClick={() => toggleCategory(category)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border ${
-                isSelected
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border ${isSelected
                   ? "bg-zinc-100 text-zinc-900 border-zinc-200 shadow-md shadow-white/5 font-extrabold"
                   : "bg-zinc-800/40 text-zinc-400 border-transparent hover:text-zinc-200 hover:bg-zinc-850"
-              }`}
+                }`}
             >
               {category}
             </motion.button>
           );
         })}
       </div>
-      
+
       {selectedCategories.length > 0 && (
         <button
           onClick={handleClear}

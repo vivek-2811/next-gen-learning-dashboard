@@ -59,9 +59,8 @@ export default function SearchBar({ onSearch, resultCount, totalCount }: SearchB
         {/* Search icon */}
         <div className="pl-4 flex items-center pointer-events-none">
           <Search
-            className={`h-4 w-4 transition-colors duration-200 ${
-              isFocused ? "text-blue-400" : "text-zinc-500"
-            }`}
+            className={`h-4 w-4 transition-colors duration-200 ${isFocused ? "text-blue-400" : "text-zinc-500"
+              }`}
           />
         </div>
 
@@ -98,11 +97,10 @@ export default function SearchBar({ onSearch, resultCount, totalCount }: SearchB
         {/* Filter icon (visual indicator) */}
         <div className="pr-4 flex items-center">
           <div
-            className={`p-1.5 rounded-lg transition-colors ${
-              isFiltered
+            className={`p-1.5 rounded-lg transition-colors ${isFiltered
                 ? "bg-blue-500/10 text-blue-400"
                 : "text-zinc-600"
-            }`}
+              }`}
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
           </div>

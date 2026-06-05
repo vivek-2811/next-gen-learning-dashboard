@@ -2,17 +2,17 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  BookOpen, 
-  Code, 
-  FlaskConical, 
-  Globe, 
-  Terminal, 
-  Cpu, 
-  Database, 
-  Layout, 
-  LineChart, 
-  Shield, 
+import {
+  BookOpen,
+  Code,
+  FlaskConical,
+  Globe,
+  Terminal,
+  Cpu,
+  Database,
+  Layout,
+  LineChart,
+  Shield,
   Sparkles,
   Calculator,
   Palette,
@@ -46,7 +46,7 @@ interface CourseCardProps {
 
 export function CourseCard({ course }: CourseCardProps) {
   const { title, icon_name, created_at } = course;
-  
+
   // Clamp progress to 0–100 to handle any out-of-range database values
   const progress = Math.min(Math.max(course.progress, 0), 100);
 
@@ -78,7 +78,7 @@ export function CourseCard({ course }: CourseCardProps) {
         hidden: { opacity: 0, y: 20 },
         show: { opacity: 1, y: 0 },
       }}
-      whileHover={{ 
+      whileHover={{
         y: -6,
         boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 25px rgba(59, 130, 246, 0.15)",
         borderColor: "rgba(59, 130, 246, 0.4)"

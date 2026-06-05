@@ -29,7 +29,7 @@ export default async function DashboardPage() {
       : "Learner";
 
   return (
-    <div className="flex min-h-screen bg-black text-zinc-100 selection:bg-blue-500/30">
+    <div className="flex min-h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 selection:bg-blue-500/30 transition-colors duration-300">
       {/* Sidebar Component */}
       <Sidebar />
 
