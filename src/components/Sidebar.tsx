@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import type { Profile } from "@/types/profile";
 import {
   Home,
   BookOpen,
@@ -28,6 +30,23 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profile, setProfile] = useState<Profile | null>(null);
+
+  // Fetch user profile on mount
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) setProfile(data as Profile);
+        });
+    });
+  }, []);
 
   const sidebarWidth = collapsed ? 80 : 260;
 
@@ -215,7 +234,7 @@ export default function Sidebar() {
               {/* User info */}
               <div className="flex items-center gap-3 overflow-hidden">
                 <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-[11px] font-black text-white shadow-md shadow-emerald-500/20">
-                  V
+                  {profile?.full_name?.charAt(0)?.toUpperCase() || "U"}
                 </div>
                 <AnimatePresence>
                   {!collapsed && (
@@ -227,10 +246,10 @@ export default function Sidebar() {
                       className="min-w-0"
                     >
                       <p className="text-xs font-bold text-zinc-200 truncate">
-                        Vivek
+                        {profile?.full_name || "User"}
                       </p>
                       <p className="text-[10px] text-zinc-500 truncate">
-                        Active Learner
+                        {profile?.email || "Active Learner"}
                       </p>
                     </motion.div>
                   )}

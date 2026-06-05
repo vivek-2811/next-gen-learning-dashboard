@@ -4,56 +4,47 @@ import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Course, CourseFetchResult } from "@/types/course";
 
-// ---------------------------------------------------------------------------
-// Column projection — kept as a constant so it stays in sync with Course.
-// ---------------------------------------------------------------------------
-const COURSE_COLUMNS = "id, title, progress, icon_name, created_at" as const;
-
 /**
- * Fetches all rows from the `courses` table, ordered newest-first.
+ * Fetches course enrollments for the currently logged-in user from the
+ * `user_courses` table, joining static details from the `courses` table.
  *
- * **Server-only** — the `"use server"` directive ensures this function is
- * never included in the browser bundle.
- *
- * **Request deduplication** — wrapped in React's `cache()` so that multiple
- * Server Components calling `getCourses()` within the same render pass share
- * a single Supabase round-trip. The cache is scoped to one request/response
- * cycle; it does not persist between requests.
- *
- * **RLS-aware** — uses the authenticated server client, so Supabase Row Level
- * Security policies on the `courses` table are enforced automatically.
- *
- * **Typed result** — returns a `CourseFetchResult` discriminated union.
- * Callers must handle both `"success"` and `"error"` branches.
- *
- * **Never throws** — all Supabase errors are caught and surfaced through the
- * `"error"` branch.
+ * **Server-only** — respects RLS policies on both tables.
  *
  * @returns {Promise<CourseFetchResult>}
- *
- * @example
- * ```tsx
- * import { getCourses } from "@/actions/getCourses"
- *
- * export default async function DashboardPage() {
- *   const result = await getCourses()
- *   if (result.status === "error") {
- *     return <p>Failed to load courses: {result.message}</p>
- *   }
- *   return <CourseGrid courses={result.data} />
- * }
- * ```
  */
 export const getCourses: () => Promise<CourseFetchResult> = cache(
   async (): Promise<CourseFetchResult> => {
     try {
       const supabase = await createClient();
 
+      // Retrieve the authenticated user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        return {
+          status: "error",
+          message: "User not authenticated.",
+          code: "NOT_AUTHENTICATED",
+        };
+      }
+
+      // Query user-specific courses, joining the course title and icon metadata
       const { data, error } = await supabase
-        .from("courses")
-        .select(COURSE_COLUMNS)
-        .order("created_at", { ascending: false })
-        .returns<Course[]>();
+        .from("user_courses")
+        .select(`
+          progress,
+          created_at,
+          courses (
+            id,
+            title,
+            icon_name
+          )
+        `)
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
 
       if (error) {
         console.error("[getCourses] Query failed:", {
@@ -70,9 +61,33 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
         };
       }
 
+      // Map rows (casting nested structure) to match standard Course shape
+      const rawData = (data as unknown) as Array<{
+        progress: number;
+        created_at: string;
+        courses: {
+          id: string;
+          title: string;
+          icon_name: string;
+        } | null;
+      }>;
+
+      const mappedCourses: Course[] = (rawData ?? [])
+        .filter((row) => row.courses !== null)
+        .map((row) => {
+          const c = row.courses!;
+          return {
+            id: c.id,
+            title: c.title,
+            progress: row.progress,
+            icon_name: c.icon_name,
+            created_at: row.created_at,
+          };
+        });
+
       return {
         status: "success",
-        data: data ?? [],
+        data: mappedCourses,
       };
     } catch (err) {
       console.error("[getCourses] Initialization or Query threw error:", err);

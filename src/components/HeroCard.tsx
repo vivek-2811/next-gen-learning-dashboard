@@ -1,8 +1,13 @@
-export default function HeroCard() {
+interface HeroCardProps {
+  userName?: string;
+  activeCoursesCount?: number;
+}
+
+export default function HeroCard({ userName = "Learner", activeCoursesCount = 0 }: HeroCardProps) {
   return (
     <div className="rounded-3xl border border-white/10 p-8 bg-zinc-900">
       <h1 className="text-4xl font-bold">
-        Welcome back, Vivek 👋
+        Welcome back, {userName} 👋
       </h1>
 
       <p className="mt-3 text-zinc-400">
@@ -17,7 +22,9 @@ export default function HeroCard() {
 
         <div>
           <span className="text-3xl">📚</span>
-          <p>4 Active Courses</p>
+          <p>
+            {activeCoursesCount} Active {activeCoursesCount === 1 ? "Course" : "Courses"}
+          </p>
         </div>
       </div>
     </div>

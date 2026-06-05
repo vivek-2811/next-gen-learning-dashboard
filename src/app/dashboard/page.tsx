@@ -8,6 +8,8 @@ import {
   FolderOpen
 } from "lucide-react";
 import { getCourses } from "@/actions/getCourses";
+import { getProfile } from "@/actions/getProfile";
+import { getActivityLogs } from "@/actions/getActivityLogs";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { CourseGrid } from "@/components/CourseGrid";
 import Sidebar from "@/components/Sidebar";
@@ -20,6 +22,17 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const result = await getCourses();
+  const profileResult = await getProfile();
+  const activityResult = await getActivityLogs();
+
+  const activityData = activityResult.status === "success" ? activityResult.data : [];
+
+  const userName =
+    profileResult.status === "success" && profileResult.data.full_name
+      ? profileResult.data.full_name
+      : "Learner";
+
+  const activeCoursesCount = result.status === "success" ? result.data.length : 0;
 
   return (
     <div className="flex min-h-screen bg-black text-zinc-100 selection:bg-blue-500/30">
@@ -29,7 +42,7 @@ export default async function DashboardPage() {
       {/* Main dashboard content container */}
       <main className="flex-1 p-8 space-y-8 overflow-y-auto max-w-7xl">
         {/* Welcome greeting card */}
-        <HeroCard />
+        <HeroCard userName={userName} activeCoursesCount={activeCoursesCount} />
 
         {/* Render Error State */}
         {result.status === "error" && (
@@ -107,7 +120,7 @@ export default async function DashboardPage() {
             <DashboardHeader courses={result.data} />
             
             {/* Learning chart */}
-            <ActivityChart />
+            <ActivityChart data={activityData} />
 
             {/* Course cards list */}
             {result.data.length === 0 ? (
