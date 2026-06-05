@@ -46,32 +46,42 @@ const COURSE_COLUMNS = "id, title, progress, icon_name, created_at" as const;
  */
 export const getCourses: () => Promise<CourseFetchResult> = cache(
   async (): Promise<CourseFetchResult> => {
-    const supabase = await createClient();
+    try {
+      const supabase = await createClient();
 
-    const { data, error } = await supabase
-      .from("courses")
-      .select(COURSE_COLUMNS)
-      .order("created_at", { ascending: false })
-      .returns<Course[]>();
+      const { data, error } = await supabase
+        .from("courses")
+        .select(COURSE_COLUMNS)
+        .order("created_at", { ascending: false })
+        .returns<Course[]>();
 
-    if (error) {
-      console.error("[getCourses] Query failed:", {
-        code: error.code,
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-      });
+      if (error) {
+        console.error("[getCourses] Query failed:", {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+
+        return {
+          status: "error",
+          message: error.message,
+          code: error.code ?? null,
+        };
+      }
 
       return {
+        status: "success",
+        data: data ?? [],
+      };
+    } catch (err: any) {
+      console.error("[getCourses] Initialization or Query threw error:", err);
+      
+      return {
         status: "error",
-        message: error.message,
-        code: error.code ?? null,
+        message: err instanceof Error ? err.message : String(err),
+        code: "INITIALIZATION_ERROR",
       };
     }
-
-    return {
-      status: "success",
-      data: data ?? [],
-    };
   },
 );
