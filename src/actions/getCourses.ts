@@ -31,20 +31,17 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
         };
       }
 
-      // Query user-specific courses, joining the course title, icon, and category metadata
+      // Query courses directly
       const { data, error } = await supabase
-        .from("user_courses")
+        .from("courses")
         .select(`
+          id,
+          title,
           progress,
-          created_at,
-          courses (
-            id,
-            title,
-            icon_name,
-            category
-          )
+          icon_name,
+          category,
+          created_at
         `)
-        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -62,31 +59,26 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
         };
       }
 
-      // Map rows (casting nested structure) to match standard Course shape
+      // Map rows directly to match standard Course shape
       const rawData = (data as unknown) as Array<{
+        id: string;
+        title: string;
         progress: number;
+        icon_name: string;
+        category: string;
         created_at: string;
-        courses: {
-          id: string;
-          title: string;
-          icon_name: string;
-          category: string;
-        } | null;
       }>;
 
-      const mappedCourses: Course[] = (rawData ?? [])
-        .filter((row) => row.courses !== null)
-        .map((row) => {
-          const c = row.courses!;
-          return {
-            id: c.id,
-            title: c.title,
-            progress: row.progress,
-            icon_name: c.icon_name,
-            created_at: row.created_at,
-            category: c.category as Course["category"],
-          };
-        });
+      const mappedCourses: Course[] = (rawData ?? []).map((row) => {
+        return {
+          id: row.id,
+          title: row.title,
+          progress: row.progress,
+          icon_name: row.icon_name,
+          created_at: row.created_at,
+          category: row.category as Course["category"],
+        };
+      });
 
       return {
         status: "success",
@@ -94,7 +86,7 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
       };
     } catch (err) {
       console.error("[getCourses] Initialization or Query threw error:", err);
-      
+
       return {
         status: "error",
         message: err instanceof Error ? err.message : String(err),
