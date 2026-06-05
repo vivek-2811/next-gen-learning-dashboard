@@ -34,6 +34,8 @@ Client components are used only where animation and interactivity are required.
 ## Setup
 
 ```bash
+git clone https://github.com/vivek-2811/next-gen-learning-dashboard.git
+cd next-gen-learning-dashboard
 npm install
 npm run dev
 ```
