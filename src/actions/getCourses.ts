@@ -44,6 +44,7 @@ export const getCourses: () => Promise<CourseFetchResult> = cache(
         .order("created_at", { ascending: false });
 
       console.log("RAW DATA:", data);
+      console.log("QUERY ERROR:", error);
 
       if (error) {
         console.error("[getCourses] Query failed:", {

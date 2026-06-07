@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import type { Course } from "@/types/course";
 import { ProgressBar } from "./ProgressBar";
+import { CardBackgroundMesh } from "./CardBackgroundMesh";
 
 // Safe, tree-shakeable icon dictionary
 const iconMap = {

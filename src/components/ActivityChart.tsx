@@ -3,13 +3,15 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart3, TrendingUp, Flame, Clock, BookOpen, CalendarOff } from "lucide-react";
+import { CardBackgroundMesh } from "./CardBackgroundMesh";
 import type { DayActivity } from "@/actions/getActivityLogs";
 
 interface ActivityChartProps {
   data: DayActivity[];
+  variants?: any;
 }
 
-export default function ActivityChart({ data }: ActivityChartProps) {
+export default function ActivityChart({ data, variants }: ActivityChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   // Derived stats
@@ -22,14 +24,17 @@ export default function ActivityChart({ data }: ActivityChartProps) {
   const bestDay = data.reduce((best, d) => (d.hours > best.hours ? d : best), data[0] || defaultDay);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 260, damping: 24, delay: 0.1 }}
-      className="rounded-3xl border border-white/[0.06] bg-zinc-900/50 backdrop-blur-xl p-6 sm:p-8 relative overflow-hidden"
+    <motion.section
+      variants={variants}
+      whileHover={{
+        scale: 1.015,
+        borderColor: "rgba(59, 130, 246, 0.4)",
+        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 25px rgba(59, 130, 246, 0.15)",
+      }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className="rounded-3xl border border-white/[0.06] bg-zinc-900/50 backdrop-blur-xl p-6 sm:p-8 relative overflow-hidden h-full flex flex-col justify-between group"
     >
-      {/* Subtle top gradient accent */}
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
+      <CardBackgroundMesh />
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
@@ -224,6 +229,6 @@ export default function ActivityChart({ data }: ActivityChartProps) {
           </motion.div>
         </>
       )}
-    </motion.div>
+    </motion.section>
   );
 }
