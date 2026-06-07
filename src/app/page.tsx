@@ -287,7 +287,8 @@ export default function Home() {
           <motion.div
             variants={itemVariants}
             whileHover={{ y: -4, borderColor: "rgba(59, 130, 246, 0.4)" }}
-            className="p-6 bg-zinc-900/30 border border-zinc-800/80 rounded-2xl backdrop-blur-sm space-y-4 transition-colors"
+            style={{ borderColor: "rgba(39, 39, 42, 0.8)" }}
+            className="p-6 bg-zinc-900/30 border rounded-2xl backdrop-blur-sm space-y-4 transition-colors"
           >
             <div className="p-3 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-xl inline-block">
               <Cpu className="h-5 w-5" />
@@ -304,7 +305,8 @@ export default function Home() {
           <motion.div
             variants={itemVariants}
             whileHover={{ y: -4, borderColor: "rgba(99, 102, 241, 0.4)" }}
-            className="p-6 bg-zinc-900/30 border border-zinc-800/80 rounded-2xl backdrop-blur-sm space-y-4 transition-colors"
+            style={{ borderColor: "rgba(39, 39, 42, 0.8)" }}
+            className="p-6 bg-zinc-900/30 border rounded-2xl backdrop-blur-sm space-y-4 transition-colors"
           >
             <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-xl inline-block">
               <Database className="h-5 w-5" />
@@ -321,7 +323,8 @@ export default function Home() {
           <motion.div
             variants={itemVariants}
             whileHover={{ y: -4, borderColor: "rgba(168, 85, 247, 0.4)" }}
-            className="p-6 bg-zinc-900/30 border border-zinc-800/80 rounded-2xl backdrop-blur-sm space-y-4 transition-colors"
+            style={{ borderColor: "rgba(39, 39, 42, 0.8)" }}
+            className="p-6 bg-zinc-900/30 border rounded-2xl backdrop-blur-sm space-y-4 transition-colors"
           >
             <div className="p-3 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-xl inline-block">
               <Layers className="h-5 w-5" />
@@ -338,7 +341,8 @@ export default function Home() {
           <motion.div
             variants={itemVariants}
             whileHover={{ y: -4, borderColor: "rgba(59, 130, 246, 0.4)" }}
-            className="p-6 bg-zinc-900/30 border border-zinc-800/80 rounded-2xl backdrop-blur-sm space-y-4 transition-colors"
+            style={{ borderColor: "rgba(39, 39, 42, 0.8)" }}
+            className="p-6 bg-zinc-900/30 border rounded-2xl backdrop-blur-sm space-y-4 transition-colors"
           >
             <div className="p-3 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-xl inline-block">
               <Lock className="h-5 w-5" />
@@ -355,7 +359,8 @@ export default function Home() {
           <motion.div
             variants={itemVariants}
             whileHover={{ y: -4, borderColor: "rgba(99, 102, 241, 0.4)" }}
-            className="p-6 bg-zinc-900/30 border border-zinc-800/80 rounded-2xl backdrop-blur-sm space-y-4 transition-colors"
+            style={{ borderColor: "rgba(39, 39, 42, 0.8)" }}
+            className="p-6 bg-zinc-900/30 border rounded-2xl backdrop-blur-sm space-y-4 transition-colors"
           >
             <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-xl inline-block">
               <Zap className="h-5 w-5" />
@@ -372,7 +377,8 @@ export default function Home() {
           <motion.div
             variants={itemVariants}
             whileHover={{ y: -4, borderColor: "rgba(168, 85, 247, 0.4)" }}
-            className="p-6 bg-zinc-900/30 border border-zinc-800/80 rounded-2xl backdrop-blur-sm space-y-4 transition-colors"
+            style={{ borderColor: "rgba(39, 39, 42, 0.8)" }}
+            className="p-6 bg-zinc-900/30 border rounded-2xl backdrop-blur-sm space-y-4 transition-colors"
           >
             <div className="p-3 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-xl inline-block">
               <Shield className="h-5 w-5" />
@@ -414,7 +420,8 @@ export default function Home() {
             <motion.div
               variants={itemVariants}
               whileHover={{ y: -5, borderColor: "rgba(59, 130, 246, 0.3)" }}
-              className="p-6 bg-zinc-900/40 border border-zinc-800/60 rounded-2xl flex flex-col justify-between backdrop-blur-sm relative transition-all"
+              style={{ borderColor: "rgba(39, 39, 42, 0.6)" }}
+              className="p-6 bg-zinc-900/40 border rounded-2xl flex flex-col justify-between backdrop-blur-sm relative transition-all"
             >
               <Quote className="absolute top-6 right-6 h-10 w-10 text-zinc-800/45 pointer-events-none" />
               <div className="space-y-4">
@@ -440,7 +447,8 @@ export default function Home() {
             <motion.div
               variants={itemVariants}
               whileHover={{ y: -5, borderColor: "rgba(99, 102, 241, 0.3)" }}
-              className="p-6 bg-zinc-900/40 border border-zinc-800/60 rounded-2xl flex flex-col justify-between backdrop-blur-sm relative transition-all"
+              style={{ borderColor: "rgba(39, 39, 42, 0.6)" }}
+              className="p-6 bg-zinc-900/40 border rounded-2xl flex flex-col justify-between backdrop-blur-sm relative transition-all"
             >
               <Quote className="absolute top-6 right-6 h-10 w-10 text-zinc-800/45 pointer-events-none" />
               <div className="space-y-4">
@@ -466,7 +474,8 @@ export default function Home() {
             <motion.div
               variants={itemVariants}
               whileHover={{ y: -5, borderColor: "rgba(168, 85, 247, 0.3)" }}
-              className="p-6 bg-zinc-900/40 border border-zinc-800/60 rounded-2xl flex flex-col justify-between backdrop-blur-sm relative transition-all"
+              style={{ borderColor: "rgba(39, 39, 42, 0.6)" }}
+              className="p-6 bg-zinc-900/40 border rounded-2xl flex flex-col justify-between backdrop-blur-sm relative transition-all"
             >
               <Quote className="absolute top-6 right-6 h-10 w-10 text-zinc-800/45 pointer-events-none" />
               <div className="space-y-4">

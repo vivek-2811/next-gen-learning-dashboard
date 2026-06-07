@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { BarChart3, TrendingUp, Flame, Clock, BookOpen, CalendarOff } from "lucide-react";
 import { CardBackgroundMesh } from "./CardBackgroundMesh";
 import type { DayActivity } from "@/actions/getActivityLogs";
 
 interface ActivityChartProps {
   data: DayActivity[];
-  variants?: any;
+  variants?: Variants;
 }
 
 export default function ActivityChart({ data, variants }: ActivityChartProps) {
@@ -32,7 +32,8 @@ export default function ActivityChart({ data, variants }: ActivityChartProps) {
         boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 25px rgba(59, 130, 246, 0.15)",
       }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="rounded-3xl border border-white/[0.06] bg-zinc-900/50 backdrop-blur-xl p-6 sm:p-8 relative overflow-hidden h-full flex flex-col justify-between group"
+      style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}
+      className="rounded-3xl border bg-zinc-900/50 backdrop-blur-xl p-6 sm:p-8 relative overflow-hidden h-full flex flex-col justify-between group"
     >
       <CardBackgroundMesh />
 
@@ -165,11 +166,10 @@ export default function ActivityChart({ data, variants }: ActivityChartProps) {
                             damping: 20,
                             delay: 0.15 + i * 0.07,
                           }}
-                          className={`relative w-full rounded-lg transition-all duration-200 cursor-pointer ${
-                            isMax
+                          className={`relative w-full rounded-lg transition-all duration-200 cursor-pointer ${isMax
                               ? "bg-gradient-to-t from-blue-600 via-cyan-500 to-cyan-400 shadow-lg shadow-cyan-500/30 border border-cyan-400/30"
                               : "bg-gradient-to-t from-blue-600/70 to-blue-500/50 border border-blue-500/20"
-                          }`}
+                            }`}
                         >
                           <div className="absolute inset-x-0 top-0 h-1 rounded-t-lg bg-white/20" />
                         </motion.div>
@@ -178,9 +178,8 @@ export default function ActivityChart({ data, variants }: ActivityChartProps) {
 
                     {/* Day Label */}
                     <span
-                      className={`text-[10px] sm:text-xs font-bold mt-1 transition-colors duration-200 ${
-                        isMax || hoveredIndex === i ? "text-cyan-400 font-extrabold" : "text-zinc-500"
-                      }`}
+                      className={`text-[10px] sm:text-xs font-bold mt-1 transition-colors duration-200 ${isMax || hoveredIndex === i ? "text-cyan-400 font-extrabold" : "text-zinc-500"
+                        }`}
                     >
                       {item.day}
                     </span>
@@ -220,9 +219,8 @@ export default function ActivityChart({ data, variants }: ActivityChartProps) {
               <p className="text-[10px] uppercase tracking-widest text-zinc-600 font-bold">
                 Daily Goal
               </p>
-              <p className={`text-lg sm:text-xl font-black mt-0.5 ${
-                avgHours >= 3 ? "text-emerald-400" : "text-amber-400"
-              }`}>
+              <p className={`text-lg sm:text-xl font-black mt-0.5 ${avgHours >= 3 ? "text-emerald-400" : "text-amber-400"
+                }`}>
                 {avgHours >= 3 ? "On Track" : "Keep Going"}
               </p>
             </div>

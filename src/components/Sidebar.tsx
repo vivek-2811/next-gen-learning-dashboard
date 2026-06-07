@@ -13,12 +13,9 @@ import {
   ChevronLeft,
   ChevronRight,
   GraduationCap,
-  Menu,
-  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import LogoutButton from "@/components/auth/LogoutButton";
-import ThemeToggle from "@/components/ThemeToggle";
 
 const navItems = [
   { id: "dashboard", label: "Dashboard", icon: Home, href: "/dashboard" },
@@ -32,20 +29,49 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
 
-  // Fetch user profile on mount
+  // FIX #4 & #3: Proper async fetch with mounted guard and error handling
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
-      supabase
+    let mounted = true;
+
+    const fetchProfile = async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user || !mounted) return;
+
+      const { data, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", user.id)
-        .single()
-        .then(({ data }) => {
-          if (data) setProfile(data as Profile);
-        });
-    });
+        .single();
+
+      if (error) {
+        console.warn("Profile fetch failed (using fallback profile):", error.message);
+        if (mounted) {
+          setProfile({
+            id: user.id,
+            full_name: user.user_metadata?.name || "Active Learner",
+            email: user.email || "learner@nextgen.edu",
+            avatar_url: "",
+            created_at: new Date().toISOString(),
+          } as Profile);
+        }
+        return;
+      }
+
+      if (data && mounted) {
+        setProfile(data as Profile);
+      }
+    };
+
+    fetchProfile();
+
+    // Cleanup: prevent state update on unmounted component
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Auto-collapse sidebar on tablet viewports (768px to 1024px)
@@ -58,7 +84,7 @@ export default function Sidebar() {
       }
     };
 
-    handleResize(); // run initially
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -71,7 +97,8 @@ export default function Sidebar() {
       style={{ width: sidebarWidth }}
     >
       {/* ── Header ── */}
-      <div className="flex items-center justify-between px-5 pt-6 pb-2">
+      {/* FIX #5: Collapse toggle merged into header row for cleaner layout */}
+      <div className="flex items-center justify-between px-4 pt-6 pb-2">
         <motion.div
           className="flex items-center gap-3 overflow-hidden"
           layout
@@ -95,10 +122,8 @@ export default function Sidebar() {
             )}
           </AnimatePresence>
         </motion.div>
-      </div>
 
-      {/* ── Collapse toggle (desktop only) ── */}
-      <div className={`flex items-center ${collapsed ? "justify-center" : "justify-end"} px-4 py-2`}>
+        {/* Collapse toggle — always visible in header */}
         <motion.button
           onClick={() => setCollapsed((c) => !c)}
           whileHover={{ scale: 1.1 }}
@@ -117,7 +142,7 @@ export default function Sidebar() {
 
       {/* ── Navigation ── */}
       <nav
-        className="flex-1 flex flex-col gap-1 px-3 mt-2"
+        className="flex-1 flex flex-col gap-1 px-3 mt-4"
         aria-label="Main navigation"
       >
         {navItems.map((item) => {
@@ -145,29 +170,19 @@ export default function Sidebar() {
                 `}
                 aria-current={isActive ? "page" : undefined}
               >
-                {/* Active background indicator (shared layoutId) */}
                 {isActive && (
                   <motion.div
                     layoutId="sidebar-active-bg"
                     className="absolute inset-0 rounded-xl bg-white/[0.07] border border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]"
-                    transition={{
-                      type: "spring",
-                      stiffness: 350,
-                      damping: 30,
-                    }}
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   />
                 )}
 
-                {/* Active left accent bar */}
                 {isActive && (
                   <motion.div
                     layoutId="sidebar-active-bar"
                     className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"
-                    transition={{
-                      type: "spring",
-                      stiffness: 350,
-                      damping: 30,
-                    }}
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   />
                 )}
 
@@ -195,14 +210,12 @@ export default function Sidebar() {
       {/* ── Footer ── */}
       <div className="px-4 pb-6 pt-4 border-t border-white/[0.05] space-y-3">
         {/* Logout button */}
-        <div className="px-0">
-          <LogoutButton collapsed={collapsed} />
-        </div>
+        <LogoutButton collapsed={collapsed} />
 
         {/* User info */}
         <div className="flex items-center gap-3 overflow-hidden">
           <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-[11px] font-black text-white shadow-md shadow-emerald-500/20">
-            {profile?.full_name?.charAt(0)?.toUpperCase() || "U"}
+            {profile?.full_name?.charAt(0)?.toUpperCase() ?? "U"}
           </div>
           <AnimatePresence>
             {!collapsed && (
@@ -214,10 +227,10 @@ export default function Sidebar() {
                 className="min-w-0"
               >
                 <p className="text-xs font-bold text-zinc-200 truncate">
-                  {profile?.full_name || "User"}
+                  {profile?.full_name ?? "User"}
                 </p>
                 <p className="text-[10px] text-zinc-500 truncate">
-                  {profile?.email || "Active Learner"}
+                  {profile?.email ?? "Active Learner"}
                 </p>
               </motion.div>
             )}

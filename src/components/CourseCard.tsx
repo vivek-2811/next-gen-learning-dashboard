@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import type { Course } from "@/types/course";
 import { ProgressBar } from "./ProgressBar";
-import { CardBackgroundMesh } from "./CardBackgroundMesh";
 
 // Safe, tree-shakeable icon dictionary
 const iconMap = {
@@ -74,18 +73,19 @@ export function CourseCard({ course }: CourseCardProps) {
   });
 
   return (
-    <motion.div
+    <motion.article
       variants={{
         hidden: { opacity: 0, y: 20 },
         show: { opacity: 1, y: 0 },
       }}
       whileHover={{
-        y: -6,
+        scale: 1.015,
         boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 25px rgba(59, 130, 246, 0.15)",
         borderColor: "rgba(59, 130, 246, 0.4)"
       }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="group flex flex-col justify-between p-6 bg-zinc-900/60 backdrop-blur-md rounded-2xl border border-zinc-800/80 transition-all duration-300 h-60 relative overflow-hidden"
+      style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}
+      className="group flex flex-col justify-between p-6 bg-zinc-900/50 backdrop-blur-xl rounded-2xl border transition-all duration-300 h-60 relative overflow-hidden"
     >
       {/* Background glow overlay on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -122,6 +122,6 @@ export function CourseCard({ course }: CourseCardProps) {
           <span>Created {formattedDate}</span>
         </div>
       </div>
-    </motion.div>
+    </motion.article>
   );
 }

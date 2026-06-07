@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { BookOpenCheck, TrendingUp, Award, Clock } from "lucide-react";
 import { CardBackgroundMesh } from "./CardBackgroundMesh";
 import type { Course } from "@/types/course";
 
 interface StatsBentoCardProps {
   courses: Course[];
-  variants?: any;
+  variants?: Variants;
 }
 
 export function StatsBentoCard({ courses, variants }: StatsBentoCardProps) {
@@ -61,7 +61,8 @@ export function StatsBentoCard({ courses, variants }: StatsBentoCardProps) {
         boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 25px rgba(59, 130, 246, 0.15)",
       }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="p-6 bg-zinc-900/50 backdrop-blur-xl border border-white/[0.06] rounded-3xl relative overflow-hidden flex flex-col justify-between h-full group"
+      style={{ borderColor: "rgba(255, 255, 255, 0.06)" }}
+      className="p-6 bg-zinc-900/50 backdrop-blur-xl border rounded-3xl relative overflow-hidden flex flex-col justify-between h-full group"
     >
       {/* Premium Textured Background */}
       <CardBackgroundMesh />
